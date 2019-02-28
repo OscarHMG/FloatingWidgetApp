@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -14,10 +14,16 @@
         android:id="@+id/btnStartWaze"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_gravity="center_horizontal|bottom"
         android:layout_margin="@dimen/fab_margin"
         android:scaleType="fitCenter"
         app:fabCustomSize="50dp"
         android:src="@drawable/waze" />
 
-</android.support.design.widget.CoordinatorLayout>
+
+
+
+
+
+
+
+</RelativeLayout>
