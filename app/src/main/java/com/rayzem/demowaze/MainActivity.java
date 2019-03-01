@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,16 +24,36 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
     public static int OVERLAY_PERMISSION_REQ_CODE_CHATHEAD = 1234;
     public static int OVERLAY_PERMISSION_REQ_CODE_CHATHEAD_MSG = 5678;
-    public FloatingActionButton btnStartWaze;
+    //public FloatingActionButton btnStartWaze;
+
+    public Button btnStartWaze;
     public TextView txtView;
+
+    private Toolbar mTopToolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        // Always cast your custom Toolbar here, and set it as the ActionBar.
+
+
+        // Get the ActionBar here to configure the way it behaves.
+        /*final ActionBar ab = getSupportActionBar();
+        //ab.setHomeAsUpIndicator(R.drawable.ic_menu); // set a custom icon for the default home button
+        ab.setDisplayShowHomeEnabled(true); // show or hide the default home button
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setDisplayShowCustomEnabled(true); // enable overriding the default toolbar layout
+        ab.setDisplayShowTitleEnabled(false); // disable the default title element here (for centered title)*/
+
+
+        mTopToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mTopToolbar);
+
         txtView = findViewById(R.id.txtView);
-        btnStartWaze = (FloatingActionButton) findViewById(R.id.btnStartWaze);
-        btnStartWaze.setOnClickListener(new View.OnClickListener() {
+        btnStartWaze = findViewById(R.id.btnStartWaze);
+        /*btnStartWaze.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Starting waze app ...", Snackbar.LENGTH_LONG)
@@ -48,8 +69,27 @@ public class MainActivity extends AppCompatActivity {
                     requestPermission(OVERLAY_PERMISSION_REQ_CODE_CHATHEAD);
                 }
             }
+        });*/
+
+        btnStartWaze.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Starting waze app ...", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+                if(canDrawOverlays(MainActivity.this)) {
+                    startFloatingBubbleService();
+                    MainActivity.this.moveTaskToBack(true);
+                    openWazeApp();
+
+
+                }else {
+                    requestPermission(OVERLAY_PERMISSION_REQ_CODE_CHATHEAD);
+                }
+            }
         });
     }
+
 
     private void startFloatingBubbleService() {
         startService(new Intent(MainActivity.this, FloatingBubbleService.class));
@@ -101,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        //getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -129,15 +169,22 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void openWazeApp() {
-        /*Intent intent = getPackageManager().getLaunchIntentForPackage("com.waze");
-        try{
-            intent
-        }catch(){
+        //Format
+        //https://www.waze.com/livemap?ll=-2.9001285%2C-79.0058965&from=-2.168974%2C-79.8397207&at=now
 
+        /*String url = String.format("https://www.waze.com/livemap?ll=%s%2C%s&from=%s%2C%s&at=now");
+        try{
+
+            Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse( url ) );
+            startActivity( intent );
+        }catch ( ActivityNotFoundException ex  ){
+            // If Waze is not installed, open it in Google Play:
+            Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse( "market://details?id=com.waze" ) );
+            startActivity(intent);
         }*/
 
 
-        Intent intent = getPackageManager().getLaunchIntentForPackage("com.waze");
+        /*Intent intent = getPackageManager().getLaunchIntentForPackage("com.waze");
         if (intent != null) {
             // We found the activity now start the activity
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -152,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
-        }
+        }*/
 
         //com.waze
         /*try {

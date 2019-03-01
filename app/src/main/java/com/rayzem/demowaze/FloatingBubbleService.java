@@ -64,14 +64,6 @@ public class FloatingBubbleService extends Service {
 
         windowManager.getDefaultDisplay().getSize(szWindow);
 
-		/*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			windowManager.getDefaultDisplay().getSize(szWindow);
-		} else {
-			int w = windowManager.getDefaultDisplay().getWidth();
-			int h = windowManager.getDefaultDisplay().getHeight();
-			szWindow.set(w, h);
-		}*/
-
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
