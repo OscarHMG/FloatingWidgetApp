@@ -1,27 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tooresls"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
 
     tools:context=".MainActivity">
 
+    <android.support.v7.widget.Toolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp">
 
-    <include layout="@layout/toolbar"/>
+
+        <!-- This is a centered logo -->
+        <ImageView
+            android:id="@+id/toolbar_logo"
+            android:src="@drawable/icon_app"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_gravity="center" />
 
 
-    <LinearLayout
-        android:id="@+id/directions"
-        android:layout_below="@+id/toolbar"
-        android:padding="10dp"
-        android:orientation="vertical"
+    </android.support.v7.widget.Toolbar>
+
+
+    <RelativeLayout
         android:background="@color/colorWhiteSmoke"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
-
+            android:layout_margin="8dp"
+            android:id="@+id/directions"
             android:padding="16dp"
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -29,98 +48,101 @@
             android:background="@drawable/shadow"
             android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:text="Origin"
-                    android:textAppearance="@style/TextViewLabel"
-                    android:layout_width="0dp"
-                    android:layout_weight="0.3"
-                    android:layout_height="wrap_content" />
 
-                <EditText
-                    style="@style/EditText.DemoWaze"
-                    android:layout_width="0dp"
-                    android:layout_weight="0.7"
-                    android:layout_height="wrap_content" />
-
-
-            </LinearLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:text="Destination"
-                    android:layout_weight="0.3"
-                    android:layout_width="0dp"
-                    android:textAppearance="@style/TextViewLabel"
-                    android:layout_height="wrap_content" />
 
-                <EditText
-                    style="@style/EditText.DemoWaze"
-                    android:layout_width="0dp"
-                    android:layout_weight="0.7"
-                    android:layout_height="wrap_content" />
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/et_destination"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorLightDarkGray"
+                        android:hint="@string/destination_editText" />
+
+                </android.support.design.widget.TextInputLayout>
+
             </LinearLayout>
         </LinearLayout>
-
-
 
         <LinearLayout
+            android:layout_margin="8dp"
+            android:layout_above="@id/wazeButton"
+            android:layout_below="@id/directions"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:background="@color/colorWhite"
+            android:layout_height="match_parent">
 
 
-            <TextView
-                android:text="No directions enter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            <LinearLayout
+                android:id="@+id/container_no_search"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:src="@drawable/navigation"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp" />
+
+                <TextView
+                    android:layout_marginTop="10dp"
+                    android:textColor="@color/colorGrayGainsBoro"
+                    android:textSize="16sp"
+                    android:text="@string/label_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+
+
+            <ListView
+                android:visibility="gone"
+                android:id="@+id/lv_destination_places"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@android:color/transparent"/>
+
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/wazeButton"
+            android:layout_width="match_parent"
+            android:elevation="8dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorWhite"
+            android:layout_height="90dp">
+
+            <Button
+                android:id="@+id/btnStartWaze"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="16dp"
+                android:text="@string/btn_waze_lbl"
+                android:textStyle=""
+                android:background="@drawable/round_button"
+
+                />
 
         </LinearLayout>
 
 
-
-
-
-    </LinearLayout>
-
-
-
-
-
-    <LinearLayout
-        android:id="@+id/wazeButton"
-        android:layout_width="match_parent"
-        android:elevation="8dp"
-        android:layout_alignParentBottom="true"
-        android:layout_height="90dp">
-
-        <Button
-            android:id="@+id/btnStartWaze"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="16px"
-            android:text="Start waze"
-            android:textStyle=""
-            style="@style/ButtonDemoWaze"
-            />
-
-    </LinearLayout>
+    </RelativeLayout>
 
 
 
 
 
-
-
-
-
-
-
-</RelativeLayout>
+</LinearLayout>

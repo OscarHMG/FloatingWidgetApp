@@ -1,6 +1,5 @@
 package com.rayzem.demowaze;
 
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Service;
@@ -19,23 +18,27 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 public class FloatingBubbleService extends Service {
     private WindowManager windowManager;
-    private RelativeLayout floatingBubbleView, removeBubbleView;
+    private RelativeLayout chatheadView, removeView;
 
-    private ImageView floatingBubbleImg, removeBubbleImg;
+    private ImageView chatheadImg, removeImg;
+    private TextView txt1;
     private int x_init_cord, y_init_cord, x_init_margin, y_init_margin;
     private Point szWindow = new Point();
-    private boolean isServiceRunning = false;
     private boolean isLeft = true;
+    private String sMsg = "";
 
     @SuppressWarnings("deprecation")
 
     @Override
     public void onCreate() {
+        // TODO Auto-generated method stub
         super.onCreate();
-        isServiceRunning = true;
+
+
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -45,7 +48,7 @@ public class FloatingBubbleService extends Service {
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 
-        removeBubbleView = (RelativeLayout) inflater.inflate(R.layout.remove_bubble, null);
+        removeView = (RelativeLayout) inflater.inflate(R.layout.remove_bubble, null);
         WindowManager.LayoutParams paramRemove = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -54,15 +57,22 @@ public class FloatingBubbleService extends Service {
                 PixelFormat.TRANSLUCENT);
         paramRemove.gravity = Gravity.TOP | Gravity.LEFT;
 
-        removeBubbleView.setVisibility(View.GONE);
-        removeBubbleImg = (ImageView) removeBubbleView.findViewById(R.id.remove_img);
-        windowManager.addView(removeBubbleView, paramRemove);
+        removeView.setVisibility(View.GONE);
+        removeImg = (ImageView) removeView.findViewById(R.id.remove_img);
+        windowManager.addView(removeView, paramRemove);
 
 
-        floatingBubbleView = (RelativeLayout) inflater.inflate(R.layout.bubble, null);
-        floatingBubbleImg = (ImageView) floatingBubbleView.findViewById(R.id.floatingBubble);
+        chatheadView = (RelativeLayout) inflater.inflate(R.layout.bubble, null);
+        chatheadImg = (ImageView) chatheadView.findViewById(R.id.floatingBubble);
 
-        windowManager.getDefaultDisplay().getSize(szWindow);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            windowManager.getDefaultDisplay().getSize(szWindow);
+        } else {
+            int w = windowManager.getDefaultDisplay().getWidth();
+            int h = windowManager.getDefaultDisplay().getHeight();
+            szWindow.set(w, h);
+        }
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -73,28 +83,30 @@ public class FloatingBubbleService extends Service {
         params.gravity = Gravity.TOP | Gravity.LEFT;
         params.x = 0;
         params.y = 100;
-        windowManager.addView(floatingBubbleView, params);
+        windowManager.addView(chatheadView, params);
 
-        floatingBubbleView.setOnTouchListener(new View.OnTouchListener() {
-            long timeStart = 0, timeEnd = 0;
-            boolean isLongClick = false, inBounded = false;
+        chatheadView.setOnTouchListener(new View.OnTouchListener() {
+            long time_start = 0, time_end = 0;
+            boolean isLongclick = false, inBounded = false;
             int remove_img_width = 0, remove_img_height = 0;
 
-            Handler handlerLongClick = new Handler();
-            Runnable runnableLongClick = new Runnable() {
+            Handler handler_longClick = new Handler();
+            Runnable runnable_longClick = new Runnable() {
 
                 @Override
                 public void run() {
+                    // TODO Auto-generated method stub
 
-                    isLongClick = true;
-                    removeBubbleView.setVisibility(View.VISIBLE);
-                    floatingBubbleLongclick();
+
+                    isLongclick = true;
+                    removeView.setVisibility(View.VISIBLE);
+                    chathead_longclick();
                 }
             };
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                WindowManager.LayoutParams layoutParams = (WindowManager.LayoutParams) floatingBubbleView.getLayoutParams();
+                WindowManager.LayoutParams layoutParams = (WindowManager.LayoutParams) chatheadView.getLayoutParams();
 
                 int x_cord = (int) event.getRawX();
                 int y_cord = (int) event.getRawY();
@@ -102,11 +114,11 @@ public class FloatingBubbleService extends Service {
 
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        timeStart = System.currentTimeMillis();
-                        handlerLongClick.postDelayed(runnableLongClick, 600);
+                        time_start = System.currentTimeMillis();
+                        handler_longClick.postDelayed(runnable_longClick, 600);
 
-                        remove_img_width = removeBubbleImg.getLayoutParams().width;
-                        remove_img_height = removeBubbleImg.getLayoutParams().height;
+                        remove_img_width = removeImg.getLayoutParams().width;
+                        remove_img_height = removeImg.getLayoutParams().height;
 
                         x_init_cord = x_cord;
                         y_init_cord = y_cord;
@@ -123,7 +135,7 @@ public class FloatingBubbleService extends Service {
                         x_cord_Destination = x_init_margin + x_diff_move;
                         y_cord_Destination = y_init_margin + y_diff_move;
 
-                        if (isLongClick) {
+                        if (isLongclick) {
                             int x_bound_left = szWindow.x / 2 - (int) (remove_img_width * 1.5);
                             int x_bound_right = szWindow.x / 2 + (int) (remove_img_width * 1.5);
                             int y_bound_top = szWindow.y - (int) (remove_img_height * 1.5);
@@ -134,35 +146,35 @@ public class FloatingBubbleService extends Service {
                                 int x_cord_remove = (int) ((szWindow.x - (remove_img_height * 1.5)) / 2);
                                 int y_cord_remove = (int) (szWindow.y - ((remove_img_width * 1.5) + getStatusBarHeight()));
 
-                                if (removeBubbleImg.getLayoutParams().height == remove_img_height) {
-                                    removeBubbleImg.getLayoutParams().height = (int) (remove_img_height * 1.5);
-                                    removeBubbleImg.getLayoutParams().width = (int) (remove_img_width * 1.5);
+                                if (removeImg.getLayoutParams().height == remove_img_height) {
+                                    removeImg.getLayoutParams().height = (int) (remove_img_height * 1.5);
+                                    removeImg.getLayoutParams().width = (int) (remove_img_width * 1.5);
 
-                                    WindowManager.LayoutParams param_remove = (WindowManager.LayoutParams) removeBubbleView.getLayoutParams();
+                                    WindowManager.LayoutParams param_remove = (WindowManager.LayoutParams) removeView.getLayoutParams();
                                     param_remove.x = x_cord_remove;
                                     param_remove.y = y_cord_remove;
 
-                                    windowManager.updateViewLayout(removeBubbleView, param_remove);
+                                    windowManager.updateViewLayout(removeView, param_remove);
                                 }
 
-                                layoutParams.x = x_cord_remove + (Math.abs(removeBubbleView.getWidth() - floatingBubbleView.getWidth())) / 2;
-                                layoutParams.y = y_cord_remove + (Math.abs(removeBubbleView.getHeight() - floatingBubbleView.getHeight())) / 2;
+                                layoutParams.x = x_cord_remove + (Math.abs(removeView.getWidth() - chatheadView.getWidth())) / 2;
+                                layoutParams.y = y_cord_remove + (Math.abs(removeView.getHeight() - chatheadView.getHeight())) / 2;
 
-                                windowManager.updateViewLayout(floatingBubbleView, layoutParams);
+                                windowManager.updateViewLayout(chatheadView, layoutParams);
                                 break;
                             } else {
                                 inBounded = false;
-                                removeBubbleImg.getLayoutParams().height = remove_img_height;
-                                removeBubbleImg.getLayoutParams().width = remove_img_width;
+                                removeImg.getLayoutParams().height = remove_img_height;
+                                removeImg.getLayoutParams().width = remove_img_width;
 
-                                WindowManager.LayoutParams param_remove = (WindowManager.LayoutParams) removeBubbleView.getLayoutParams();
-                                int x_cord_remove = (szWindow.x - removeBubbleView.getWidth()) / 2;
-                                int y_cord_remove = szWindow.y - (removeBubbleView.getHeight() + getStatusBarHeight());
+                                WindowManager.LayoutParams param_remove = (WindowManager.LayoutParams) removeView.getLayoutParams();
+                                int x_cord_remove = (szWindow.x - removeView.getWidth()) / 2;
+                                int y_cord_remove = szWindow.y - (removeView.getHeight() + getStatusBarHeight());
 
                                 param_remove.x = x_cord_remove;
                                 param_remove.y = y_cord_remove;
 
-                                windowManager.updateViewLayout(removeBubbleView, param_remove);
+                                windowManager.updateViewLayout(removeView, param_remove);
                             }
 
                         }
@@ -171,18 +183,18 @@ public class FloatingBubbleService extends Service {
                         layoutParams.x = x_cord_Destination;
                         layoutParams.y = y_cord_Destination;
 
-                        windowManager.updateViewLayout(floatingBubbleView, layoutParams);
+                        windowManager.updateViewLayout(chatheadView, layoutParams);
                         break;
                     case MotionEvent.ACTION_UP:
-                        isLongClick = false;
-                        removeBubbleView.setVisibility(View.GONE);
-                        removeBubbleImg.getLayoutParams().height = remove_img_height;
-                        removeBubbleImg.getLayoutParams().width = remove_img_width;
-                        handlerLongClick.removeCallbacks(runnableLongClick);
+                        isLongclick = false;
+                        removeView.setVisibility(View.GONE);
+                        removeImg.getLayoutParams().height = remove_img_height;
+                        removeImg.getLayoutParams().width = remove_img_width;
+                        handler_longClick.removeCallbacks(runnable_longClick);
 
                         if (inBounded) {
+
                             stopService(new Intent(FloatingBubbleService.this, FloatingBubbleService.class));
-                            isServiceRunning = false;
                             inBounded = false;
                             break;
                         }
@@ -192,11 +204,10 @@ public class FloatingBubbleService extends Service {
                         int y_diff = y_cord - y_init_cord;
 
                         if (Math.abs(x_diff) < 5 && Math.abs(y_diff) < 5) {
-                            timeEnd = System.currentTimeMillis();
-                            if ((timeEnd - timeStart) < 300) {
-                                floatingBubbleClicked();
-                                stopService(new Intent(FloatingBubbleService.this, FloatingBubbleService.class));
-                                isServiceRunning = false;
+                            time_end = System.currentTimeMillis();
+                            if ((time_end - time_start) < 300) {
+                                chathead_click();
+                                return true;
                             }
                         }
 
@@ -205,8 +216,8 @@ public class FloatingBubbleService extends Service {
                         int BarHeight = getStatusBarHeight();
                         if (y_cord_Destination < 0) {
                             y_cord_Destination = 0;
-                        } else if (y_cord_Destination + (floatingBubbleView.getHeight() + BarHeight) > szWindow.y) {
-                            y_cord_Destination = szWindow.y - (floatingBubbleView.getHeight() + BarHeight);
+                        } else if (y_cord_Destination + (chatheadView.getHeight() + BarHeight) > szWindow.y) {
+                            y_cord_Destination = szWindow.y - (chatheadView.getHeight() + BarHeight);
                         }
                         layoutParams.y = y_cord_Destination;
 
@@ -215,6 +226,7 @@ public class FloatingBubbleService extends Service {
 
                         break;
                     default:
+
                         break;
                 }
                 return true;
@@ -234,24 +246,21 @@ public class FloatingBubbleService extends Service {
         if (windowManager == null)
             return;
 
-        windowManager.getDefaultDisplay().getSize(szWindow);
-
-		/*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             windowManager.getDefaultDisplay().getSize(szWindow);
         } else {
             int w = windowManager.getDefaultDisplay().getWidth();
             int h = windowManager.getDefaultDisplay().getHeight();
             szWindow.set(w, h);
-        }*/
+        }
 
-        WindowManager.LayoutParams layoutParams = (WindowManager.LayoutParams) floatingBubbleView.getLayoutParams();
+        WindowManager.LayoutParams layoutParams = (WindowManager.LayoutParams) chatheadView.getLayoutParams();
 
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
 
-
-            if (layoutParams.y + (floatingBubbleView.getHeight() + getStatusBarHeight()) > szWindow.y) {
-                layoutParams.y = szWindow.y - (floatingBubbleView.getHeight() + getStatusBarHeight());
-                windowManager.updateViewLayout(floatingBubbleView, layoutParams);
+            if (layoutParams.y + (chatheadView.getHeight() + getStatusBarHeight()) > szWindow.y) {
+                layoutParams.y = szWindow.y - (chatheadView.getHeight() + getStatusBarHeight());
+                windowManager.updateViewLayout(chatheadView, layoutParams);
             }
 
             if (layoutParams.x != 0 && layoutParams.x < szWindow.x) {
@@ -259,7 +268,6 @@ public class FloatingBubbleService extends Service {
             }
 
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-
             if (layoutParams.x > szWindow.x) {
                 resetPosition(szWindow.x);
             }
@@ -285,34 +293,34 @@ public class FloatingBubbleService extends Service {
         final int x = szWindow.x - x_cord_now;
 
         new CountDownTimer(500, 5) {
-            WindowManager.LayoutParams mParams = (WindowManager.LayoutParams) floatingBubbleView.getLayoutParams();
+            WindowManager.LayoutParams mParams = (WindowManager.LayoutParams) chatheadView.getLayoutParams();
 
             public void onTick(long t) {
                 long step = (500 - t) / 5;
                 mParams.x = 0 - (int) (double) bounceValue(step, x);
-                windowManager.updateViewLayout(floatingBubbleView, mParams);
+                windowManager.updateViewLayout(chatheadView, mParams);
             }
 
             public void onFinish() {
                 mParams.x = 0;
-                windowManager.updateViewLayout(floatingBubbleView, mParams);
+                windowManager.updateViewLayout(chatheadView, mParams);
             }
         }.start();
     }
 
     private void moveToRight(final int x_cord_now) {
         new CountDownTimer(500, 5) {
-            WindowManager.LayoutParams mParams = (WindowManager.LayoutParams) floatingBubbleView.getLayoutParams();
+            WindowManager.LayoutParams mParams = (WindowManager.LayoutParams) chatheadView.getLayoutParams();
 
             public void onTick(long t) {
                 long step = (500 - t) / 5;
-                mParams.x = szWindow.x + (int) (double) bounceValue(step, x_cord_now) - floatingBubbleView.getWidth();
-                windowManager.updateViewLayout(floatingBubbleView, mParams);
+                mParams.x = szWindow.x + (int) (double) bounceValue(step, x_cord_now) - chatheadView.getWidth();
+                windowManager.updateViewLayout(chatheadView, mParams);
             }
 
             public void onFinish() {
-                mParams.x = szWindow.x - floatingBubbleView.getWidth();
-                windowManager.updateViewLayout(floatingBubbleView, mParams);
+                mParams.x = szWindow.x - chatheadView.getWidth();
+                windowManager.updateViewLayout(chatheadView, mParams);
             }
         }.start();
     }
@@ -327,29 +335,29 @@ public class FloatingBubbleService extends Service {
         return statusBarHeight;
     }
 
-    private void floatingBubbleClicked() {
+    private void chathead_click() {
+
+        stopSelf();
         Intent it = new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(it);
-
     }
 
-    private void floatingBubbleLongclick() {
+    private void chathead_longclick() {
 
-        WindowManager.LayoutParams param_remove = (WindowManager.LayoutParams) removeBubbleView.getLayoutParams();
-        int x_cord_remove = (szWindow.x - removeBubbleView.getWidth()) / 2;
-        int y_cord_remove = szWindow.y - (removeBubbleView.getHeight() + getStatusBarHeight());
+        WindowManager.LayoutParams param_remove = (WindowManager.LayoutParams) removeView.getLayoutParams();
+        int x_cord_remove = (szWindow.x - removeView.getWidth()) / 2;
+        int y_cord_remove = szWindow.y - (removeView.getHeight() + getStatusBarHeight());
 
         param_remove.x = x_cord_remove;
         param_remove.y = y_cord_remove;
 
-        windowManager.updateViewLayout(removeBubbleView, param_remove);
+        windowManager.updateViewLayout(removeView, param_remove);
     }
-
-
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // TODO Auto-generated method stub
 
         if (startId == Service.START_STICKY) {
             handleStart();
@@ -365,12 +373,13 @@ public class FloatingBubbleService extends Service {
         // TODO Auto-generated method stub
         super.onDestroy();
 
-        if (floatingBubbleView != null) {
-            windowManager.removeView(floatingBubbleView);
+        if (chatheadView != null) {
+            windowManager.removeView(chatheadView);
         }
 
-        if (removeBubbleView != null) {
-            windowManager.removeView(removeBubbleView);
+
+        if (removeView != null) {
+            windowManager.removeView(removeView);
         }
 
     }

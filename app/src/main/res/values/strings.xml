@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">DemoWaze</string>
     <string name="action_settings">Settings</string>
+    <string name="destination_editText">Destination</string>
+    <string name="label_search">Enter address to perform the navigation</string>
+    <string name="btn_waze_lbl">Start waze</string>
 </resources>
